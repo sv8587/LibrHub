@@ -9,6 +9,12 @@ let connectionMode: 'atlas' | 'local' | 'memory' = 'memory';
 export async function connectDB(): Promise<{ mode: string; isConnected: boolean }> {
   const uri = process.env.MONGODB_URI;
 
+  if (mongoose.connection.readyState === 1) {
+    isConnected = true;
+    connectionMode = uri?.includes('mongodb+srv') ? 'atlas' : 'local';
+    return { mode: connectionMode, isConnected: true };
+  }
+
   if (uri && (uri.startsWith('mongodb://') || uri.startsWith('mongodb+srv://'))) {
     try {
       console.log('Attempting MongoDB connection to:', uri.replace(/:([^:@]+)@/, ':****@'));
